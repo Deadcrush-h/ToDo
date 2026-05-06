@@ -52,3 +52,7 @@ migrate-up:
 migrate-down:
 	@make migrate-action action=down
 	
+todoapp-run:
+	@export LOGGER_FOLDER=${PROJECT_ROOT}/out/logs && \
+	go mod tidy && \
+	go run cmd/todoapp/main.go
