@@ -3,6 +3,7 @@ package users_transport_http
 import (
 	"net/http"
 
+	"github.com/Deadcrush-h/ToDo/internal/core/domain"
 	core_logger "github.com/Deadcrush-h/ToDo/internal/core/logger"
 	core_http_request "github.com/Deadcrush-h/ToDo/internal/core/transport/http/request"
 	core_http_response "github.com/Deadcrush-h/ToDo/internal/core/transport/http/response"
@@ -33,4 +34,29 @@ func (h *UsersHTTPHandler) CreateUser(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userDomain := domainFromDTO(request)
+
+	userDomain, err := h.userServise.CreateUser(ctx, userDomain)
+	if err != nil {
+		responseHandler.ErrorResponse(err, "failed to create user")
+		return
+	}
+
+	response := dtoFromDomain(userDomain)
+
+	responseHandler.JSONResponse(response, http.StatusCreated)
+
+}
+
+func domainFromDTO(dto CreateUserRequest) domain.User {
+	return domain.NewUserUnitialized(dto.FullName, dto.PhoneNumber)
+}
+
+func dtoFromDomain(user domain.User) CreateUserResponse {
+	return CreateUserResponse{
+		ID:          user.ID,
+		Version:     user.Version,
+		FullName:    user.FullName,
+		PhoneNumber: user.PhoneNumber,
+	}
 }
