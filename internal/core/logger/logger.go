@@ -63,6 +63,7 @@ func NewLogger(config Config) (*Logger, error) {
 		file:   logFile,
 	}, nil
 }
+
 func (l *Logger) With(field ...zap.Field) *Logger {
 	return &Logger{
 		Logger: l.Logger.With(field...),
