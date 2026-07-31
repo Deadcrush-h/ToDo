@@ -10,8 +10,8 @@ import (
 )
 
 type CreateUserRequest struct { // dto
-	FullName    string  `json:"full_name" validate:"required, min=3,max=100"`
-	PhoneNumber *string `json:"phone_number" validate:"omitempty,min=10,max=15,startwith=+"`
+	FullName    string  `json:"full_name" validate:"required,min=3,max=100"`
+	PhoneNumber *string `json:"phone_number" validate:"omitempty,min=10,max=15,startswith=+"`
 }
 
 type CreateUserResponse struct {
@@ -36,7 +36,7 @@ func (h *UsersHTTPHandler) CreateUser(rw http.ResponseWriter, r *http.Request) {
 
 	userDomain := domainFromDTO(request)
 
-	userDomain, err := h.userServise.CreateUser(ctx, userDomain)
+	userDomain, err := h.userService.CreateUser(ctx, userDomain)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "failed to create user")
 		return

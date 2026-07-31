@@ -47,7 +47,7 @@ func main() {
 
 	usersRepository := user_postgres_repository.NewUsersRepository(pool)
 	usersService := users_service.NewUsersService(usersRepository)
-	usersTransportHTTP := users_transport_http.NewUsersHTTTPHandler(usersService)
+	usersTransportHTTP := users_transport_http.NewUsersHTTPHandler(usersService)
 
 	appLogger.Debug("initializing HTTP server")
 	appLogger.Debug("Starting ToDo application!")

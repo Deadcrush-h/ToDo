@@ -9,8 +9,8 @@ import (
 
 type Config struct {
 	Host     string        `envconfig:"HOST" required:"true"`
-	Port     string        `envconfig:"USER" default:"5432"`
-	User     string        `envconfig:"PORT" required:"true"`
+	Port     string        `envconfig:"PORT" required:"true"`
+	User     string        `envconfig:"USER" default:"5432"`
 	Password string        `envconfig:"PASSWORD" required:"true"`
 	Database string        `envconfig:"DB" required:"true"`
 	Timeout  time.Duration `envconfig:"TIMEOUT" required:"true"`
