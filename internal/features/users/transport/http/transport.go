@@ -9,7 +9,7 @@ import (
 )
 
 type UsersHTTPHandler struct {
-	userServise UserService
+	userService UserService
 }
 
 type UserService interface {
@@ -19,11 +19,15 @@ type UserService interface {
 	) (domain.User, error)
 }
 
-func NewUsersHTTTPHandler(
+func NewUsersHTTPHandler(
 	userService UserService,
 ) *UsersHTTPHandler {
+	if userService == nil {
+		panic("userService is required for UsersHTTPHandler")
+	}
+
 	return &UsersHTTPHandler{
-		userServise: userService,
+		userService: userService,
 	}
 }
 

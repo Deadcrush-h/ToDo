@@ -7,6 +7,9 @@ import (
 	core_error "github.com/Deadcrush-h/ToDo/internal/core/errors"
 )
 
+// Выносим регулярку на уровень пакета, чтобы не компилировать её при каждом вызове Validate()
+var phoneRegexp = regexp.MustCompile(`^\+[0-9]+$`)
+
 type User struct {
 	ID      int
 	Version int
@@ -60,15 +63,14 @@ func (u *User) Validate() error {
 				core_error.ErrInvalidArgument,
 			)
 		}
-	}
-	re := regexp.MustCompile(`^\+[0-9]+$`)
 
-	if !re.MatchString(*u.PhoneNumber) {
-		return fmt.Errorf(
-			"invalid `PhoneNumber` format: %w",
-			core_error.ErrInvalidArgument,
-		)
+		if !phoneRegexp.MatchString(*u.PhoneNumber) {
+			return fmt.Errorf(
+				"invalid `PhoneNumber` format: %w",
+				core_error.ErrInvalidArgument,
+			)
+		}
 	}
-	
+
 	return nil
 }
