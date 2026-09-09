@@ -8,18 +8,18 @@ import (
 )
 
 type Config struct {
-	Host     string        `envconfig:"HOST" required:"true"`
-	Port     string        `envconfig:"PORT" required:"true"`
-	User     string        `envconfig:"USER" default:"5432"`
-	Password string        `envconfig:"PASSWORD" required:"true"`
-	Database string        `envconfig:"DB" required:"true"`
-	Timeout  time.Duration `envconfig:"TIMEOUT" required:"true"`
+	Host     string        `envconfig:"POSTGRES_HOST" default:"localhost"`
+	Port     string        `envconfig:"POSTGRES_PORT" default:"5434"`
+	User     string        `envconfig:"POSTGRES_USER" required:"true"`
+	Password string        `envconfig:"POSTGRES_PASSWORD" required:"true"`
+	Database string        `envconfig:"POSTGRES_DB" required:"true"`
+	Timeout  time.Duration `envconfig:"POSTGRES_TIMEOUT" required:"true"`
 }
 
 func NewConfig() (Config, error) {
 	var config Config
 
-	if err := envconfig.Process("POSTGRES", &config); err != nil {
+	if err := envconfig.Process("", &config); err != nil {
 		return Config{}, fmt.Errorf("process envconfig: %w", err)
 	}
 	return config, nil

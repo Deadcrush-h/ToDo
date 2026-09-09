@@ -2,30 +2,31 @@ package user_postgres_repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/Deadcrush-h/ToDo/internal/core/domain"
+	core_error "github.com/Deadcrush-h/ToDo/internal/core/errors"
+	"github.com/jackc/pgx/v5"
 )
 
-func (r *UsersRepository) CreateUser(
+func (r *UsersRepository) GetUser(
 	ctx context.Context,
-	user domain.User,
+	id int,
 ) (domain.User, error) {
-	/*if r.pool == nil {
-		return domain.User{}, fmt.Errorf("postgres pool is not initialized (nil)")
-	}*/
-
 	ctx, cancel := context.WithTimeout(ctx, r.pool.OpTimeout())
 	defer cancel()
 
 	query := `
-		INSERT INTO todoapp.users (full_name, phone_number)
-		VALUES ($1, $2)
-		RETURNING id, version, full_name, phone_number;
+	SELECT id, version, full_name, phone_number
+	FROM todoapp.users
+	WHERE id=$1
 	`
-	row := r.pool.QueryRow(ctx, query, user.FullName, user.PhoneNumber)
+
+	row := r.pool.QueryRow(ctx, query, id)
 
 	var userModel UserModel
+
 	err := row.Scan(
 		&userModel.ID,
 		&userModel.Version,
@@ -33,6 +34,13 @@ func (r *UsersRepository) CreateUser(
 		&userModel.PhoneNumber,
 	)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domain.User{}, fmt.Errorf(
+				"user with id='%d': %w",
+				id,
+				core_error.ErrNotFound,
+			)
+		}
 		return domain.User{}, fmt.Errorf("scan error: %w", err)
 	}
 
