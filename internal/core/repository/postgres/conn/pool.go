@@ -36,17 +36,36 @@ func NewConnectionPool(
 		config.Port,
 		config.Database,
 	)
+
 	pgxconfig, err := pgxpool.ParseConfig(connectionString)
 	if err != nil {
 		return nil, fmt.Errorf("parse pgxconfig: %w", err)
 	}
+
+	// Установить таймаут подключения
+	pgxconfig.ConnConfig.ConnectTimeout = config.Timeout
+
+	// Дополнительные настройки для решения проблемы EOF
+	pgxconfig.ConnConfig.RuntimeParams["application_name"] = "todoapp"
+	pgxconfig.MaxConns = 10
+	pgxconfig.MinConns = 1
+	pgxconfig.MaxConnLifetime = time.Hour
+	pgxconfig.MaxConnIdleTime = 30 * time.Minute
+
+	// Явно отключить SSL
+	pgxconfig.ConnConfig.TLSConfig = nil
 
 	pool, err := pgxpool.NewWithConfig(ctx, pgxconfig)
 	if err != nil {
 		return nil, fmt.Errorf("create pgxpool: %w", err)
 	}
 
-	if err := pool.Ping(ctx); err != nil {
+	// Использовать контекст с таймаутом для пинга
+	pingCtx, cancel := context.WithTimeout(ctx, config.Timeout)
+	defer cancel()
+
+	if err := pool.Ping(pingCtx); err != nil {
+		pool.Close()
 		return nil, fmt.Errorf("pgxpool ping: %w", err)
 	}
 
